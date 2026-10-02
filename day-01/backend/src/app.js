@@ -4,6 +4,7 @@ import healthRoutes from "./routes/health.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import logger from "./middleware/logger.middleware.js";
 import requestInfo from "./middleware/requestInfo.middleware.js";
+import errorHandler from "./middleware/error.middleware.js";
 
 const app = express();
 app.use(logger);
@@ -19,5 +20,7 @@ app.use(express.json());
 
 app.use("/", healthRoutes);
 app.use("/api", userRoutes);
+
+app.use(errorHandler);
 
 export default app;
