@@ -39,6 +39,20 @@ export const getUserByIdService = async (id) => {
 };
 
 export const updateUserService = async (id, data) => {
+  if (data.email) {
+    const existingUser = await User.findOne({
+      email: data.email,
+      _id: { $ne: id },
+    });
+
+    if (existingUser) {
+      const error = new Error("Email already registered");
+      error.statusCode = 409;
+
+      throw error;
+    }
+  }
+
   const user = await User.findByIdAndUpdate(
     id,
     data,
