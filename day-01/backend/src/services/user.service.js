@@ -4,14 +4,55 @@ export const createUserService = async ({ name, email, password }) => {
   const existingUser = await User.findOne({ email });
 
   if (existingUser) {
-    throw new Error("Email already registered");
+    const error = new Error("Email already registered");
+    error.statusCode = 409;
+
+    throw error;
   }
 
   const user = await User.create({
     name,
     email,
-    password
+    password,
   });
+
+  return user;
+};
+
+export const getUsersService = async () => {
+  const users = await User.find();
+
+  return users;
+};
+
+export const getUserByIdService = async (id) => {
+  const user = await User.findById(id);
+
+  if (!user) {
+    const error = new Error("User not found");
+    error.statusCode = 404;
+
+    throw error;
+  }
+
+  return user;
+};
+
+export const updateUserService = async (id, data) => {
+  const user = await User.findByIdAndUpdate(
+    id,
+    data,
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  return user;
+};
+
+export const deleteUserService = async (id) => {
+  const user = await User.findByIdAndDelete(id);
 
   return user;
 };

@@ -7,8 +7,6 @@ import requestInfo from "./middleware/requestInfo.middleware.js";
 import errorHandler from "./middleware/error.middleware.js";
 
 const app = express();
-app.use(logger);
-app.use(requestInfo);
 
 app.use(
   cors({
@@ -17,6 +15,9 @@ app.use(
 );
 
 app.use(express.json());
+
+app.use(logger);
+app.use(requestInfo);
 
 app.use("/", healthRoutes);
 app.use("/api", userRoutes);

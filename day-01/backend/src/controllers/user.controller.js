@@ -1,4 +1,10 @@
-import { createUserService } from "../services/user.service.js";
+import {
+  createUserService,
+  getUsersService,
+  getUserByIdService,
+  updateUserService,
+  deleteUserService,
+} from "../services/user.service.js";
 
 export const createUser = async (req, res, next) => {
   try {
@@ -13,6 +19,66 @@ export const createUser = async (req, res, next) => {
     res.status(201).json({
       message: "User created successfully",
       user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getUsers = async (req, res, next) => {
+  try {
+    const users = await getUsersService();
+
+    res.status(200).json({
+      users,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getUserById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const user = await getUserByIdService(id);
+
+    res.status(200).json({
+      user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { name, email, password } = req.body;
+
+    const user = await updateUserService(id, {
+      name,
+      email,
+      password,
+    });
+
+    res.status(200).json({
+      message: "User updated successfully",
+      user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    await deleteUserService(id);
+
+    res.status(200).json({
+      message: "User deleted successfully",
     });
   } catch (error) {
     next(error);
