@@ -7,10 +7,11 @@ import {
   updateUser,
   deleteUser,
 } from "../controllers/user.controller.js";
+import validateCreateUser from "../middleware/validate.middleware.js";
 
 const router = express.Router();
 
-router.post("/users", createUser);
+router.post("/users", validateCreateUser, createUser);
 router.get("/users", getUsers);
 router.get("/users/:id", getUserById);
 router.patch("/users/:id", updateUser);

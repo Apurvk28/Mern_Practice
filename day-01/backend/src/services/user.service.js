@@ -48,11 +48,25 @@ export const updateUserService = async (id, data) => {
     }
   );
 
+  if (!user) {
+    const error = new Error("User not found");
+    error.statusCode = 404;
+
+    throw error;
+  }
+
   return user;
 };
 
 export const deleteUserService = async (id) => {
   const user = await User.findByIdAndDelete(id);
+
+  if (!user) {
+    const error = new Error("User not found");
+    error.statusCode = 404;
+
+    throw error;
+  }
 
   return user;
 };
