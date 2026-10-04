@@ -1,28 +1,111 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Users from "./components/Users.jsx";
+import {
+  createUser,
+  getUsers,
+  updateUser,
+  deleteUser,
+} from "./services/user.service.js";
 
 function App() {
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const [users, setUsers] = useState([]);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const data = await getUsers();
+
+        setUsers(data);
+      } catch (error) {
+        setError("Failed to load users");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const response = await fetch("http://localhost:5001/api/users", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+    try {
+      setError("");
+      setSuccess("");
+
+      const data = await createUser({
         name,
         email,
         password,
-      }),
-    });
+      });
 
-    const data = await response.json();
+      setUsers((previousUsers) => [
+        ...previousUsers,
+        data.user,
+      ]);
 
-    console.log(data);
+      setSuccess("User created successfully");
+
+      setName("");
+      setEmail("");
+      setPassword("");
+    } catch (error) {
+      setError(
+        error.response?.data?.message || "Failed to create user"
+      );
+    }
+  };
+
+  const handleUpdate = async (id, data) => {
+    try {
+      setError("");
+      setSuccess("");
+
+      const response = await updateUser(id, data);
+
+      setUsers((previousUsers) =>
+        previousUsers.map((user) =>
+          user._id === id ? response.user : user
+        )
+      );
+
+      setSuccess("User updated successfully");
+    } catch (error) {
+      setError(
+        error.response?.data?.message || "Failed to update user"
+      );
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      setError("");
+      setSuccess("");
+
+      await deleteUser(id);
+
+      setUsers((previousUsers) =>
+        previousUsers.filter((user) => user._id !== id)
+      );
+
+      setSuccess("User deleted successfully");
+    } catch (error) {
+      setError(
+        error.response?.data?.message || "Failed to delete user"
+      );
+    }
   };
 
   return (
@@ -51,8 +134,24 @@ function App() {
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        <button type="submit">Create User</button>
+        <button type="submit">
+          Create User
+        </button>
       </form>
+
+      {success && <p>{success}</p>}
+
+      {loading ? (
+        <p>Loading users...</p>
+      ) : error ? (
+        <p>{error}</p>
+      ) : (
+        <Users
+          users={users}
+          onDelete={handleDelete}
+          onUpdate={handleUpdate}
+        />
+      )}
     </div>
   );
 }
