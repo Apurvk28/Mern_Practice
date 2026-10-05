@@ -1,12 +1,28 @@
 import axiosInstance from "../api/axios.js";
 
-export const getUsers = async () => {
-  const response = await axiosInstance.get("/api/users");
+export const getUsers = async (search = "") => {
+  const response = await axiosInstance.get("/api/users", {
+    params: {
+      search,
+    },
+  });
 
   return response.data.users;
 };
 
-export const createUser = async ({ name, email, password }) => {
+export const getUserById = async (id) => {
+  const response = await axiosInstance.get(
+    `/api/users/${id}`
+  );
+
+  return response.data.user;
+};
+
+export const createUser = async ({
+  name,
+  email,
+  password,
+}) => {
   const response = await axiosInstance.post("/api/users", {
     name,
     email,

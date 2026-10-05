@@ -1,14 +1,22 @@
 import { useEffect, useState } from "react";
 import Users from "./components/Users.jsx";
+import Navbar from "./components/Navbar.jsx";
 import {
   createUser,
   getUsers,
   updateUser,
   deleteUser,
 } from "./services/user.service.js";
+import {
+  Routes,
+  Route,
+} from "react-router-dom";
+import Home from "./pages/Home.jsx";
+import UserDetails from "./pages/UserDetails.jsx";
+import UserSearch from "./pages/UserSearch.jsx";
+import NotFound from "./pages/NotFound.jsx";
 
 function App() {
-
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -63,7 +71,8 @@ function App() {
       setPassword("");
     } catch (error) {
       setError(
-        error.response?.data?.message || "Failed to create user"
+        error.response?.data?.message ||
+          "Failed to create user"
       );
     }
   };
@@ -84,7 +93,8 @@ function App() {
       setSuccess("User updated successfully");
     } catch (error) {
       setError(
-        error.response?.data?.message || "Failed to update user"
+        error.response?.data?.message ||
+          "Failed to update user"
       );
     }
   };
@@ -97,62 +107,102 @@ function App() {
       await deleteUser(id);
 
       setUsers((previousUsers) =>
-        previousUsers.filter((user) => user._id !== id)
+        previousUsers.filter(
+          (user) => user._id !== id
+        )
       );
 
       setSuccess("User deleted successfully");
     } catch (error) {
       setError(
-        error.response?.data?.message || "Failed to delete user"
+        error.response?.data?.message ||
+          "Failed to delete user"
       );
     }
   };
 
   return (
-    <div>
-      <h1>Create User</h1>
+    <>
+      <Navbar />
 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+      <Routes>
+        <Route
+          path="/"
+          element={<Home />}
         />
 
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+        <Route
+          path="/users"
+          element={
+            <div>
+              <h1>Create User</h1>
+
+              <form onSubmit={handleSubmit}>
+                <input
+                  type="text"
+                  placeholder="Name"
+                  value={name}
+                  onChange={(e) =>
+                    setName(e.target.value)
+                  }
+                />
+
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) =>
+                    setEmail(e.target.value)
+                  }
+                />
+
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) =>
+                    setPassword(e.target.value)
+                  }
+                />
+
+                <button type="submit">
+                  Create User
+                </button>
+              </form>
+
+              {success && <p>{success}</p>}
+
+              {loading ? (
+                <p>Loading users...</p>
+              ) : error ? (
+                <p>{error}</p>
+              ) : (
+                <Users
+                  users={users}
+                  onDelete={handleDelete}
+                  onUpdate={handleUpdate}
+                />
+              )}
+            </div>
+          }
         />
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+        <Route
+          path="/users/:id"
+          element={<UserDetails />}
         />
 
-        <button type="submit">
-          Create User
-        </button>
-      </form>
-
-      {success && <p>{success}</p>}
-
-      {loading ? (
-        <p>Loading users...</p>
-      ) : error ? (
-        <p>{error}</p>
-      ) : (
-        <Users
-          users={users}
-          onDelete={handleDelete}
-          onUpdate={handleUpdate}
+        <Route
+          path="/user-search"
+          element={<UserSearch />}
         />
-      )}
-    </div>
+        <Route
+         path="*"
+         element={<NotFound />}
+        />
+        
+      </Routes>
+    </>
   );
 }
 

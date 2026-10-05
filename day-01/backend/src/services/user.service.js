@@ -1,6 +1,10 @@
 import User from "../models/user.model.js";
 
-export const createUserService = async ({ name, email, password }) => {
+export const createUserService = async ({
+  name,
+  email,
+  password,
+}) => {
   const existingUser = await User.findOne({ email });
 
   if (existingUser) {
@@ -19,8 +23,17 @@ export const createUserService = async ({ name, email, password }) => {
   return user;
 };
 
-export const getUsersService = async () => {
-  const users = await User.find();
+export const getUsersService = async (search = "") => {
+  const filter = {};
+
+  if (search) {
+    filter.name = {
+      $regex: search,
+      $options: "i",
+    };
+  }
+
+  const users = await User.find(filter);
 
   return users;
 };

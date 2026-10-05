@@ -27,7 +27,9 @@ export const createUser = async (req, res, next) => {
 
 export const getUsers = async (req, res, next) => {
   try {
-    const users = await getUsersService();
+    const { search } = req.query;
+
+    const users = await getUsersService(search);
 
     res.status(200).json({
       users,
