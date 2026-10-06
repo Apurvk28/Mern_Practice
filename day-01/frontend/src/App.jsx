@@ -7,19 +7,18 @@ import {
   updateUser,
   deleteUser,
 } from "./services/user.service.js";
-import {
-  Routes,
-  Route,
-} from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home.jsx";
 import UserDetails from "./pages/UserDetails.jsx";
 import UserSearch from "./pages/UserSearch.jsx";
 import NotFound from "./pages/NotFound.jsx";
 
 function App() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
 
   const [users, setUsers] = useState([]);
 
@@ -46,6 +45,15 @@ function App() {
     fetchUsers();
   }, []);
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -53,11 +61,7 @@ function App() {
       setError("");
       setSuccess("");
 
-      const data = await createUser({
-        name,
-        email,
-        password,
-      });
+      const data = await createUser(formData);
 
       setUsers((previousUsers) => [
         ...previousUsers,
@@ -66,9 +70,11 @@ function App() {
 
       setSuccess("User created successfully");
 
-      setName("");
-      setEmail("");
-      setPassword("");
+      setFormData({
+        name: "",
+        email: "",
+        password: "",
+      });
     } catch (error) {
       setError(
         error.response?.data?.message ||
@@ -126,10 +132,7 @@ function App() {
       <Navbar />
 
       <Routes>
-        <Route
-          path="/"
-          element={<Home />}
-        />
+        <Route path="/" element={<Home />} />
 
         <Route
           path="/users"
@@ -140,29 +143,26 @@ function App() {
               <form onSubmit={handleSubmit}>
                 <input
                   type="text"
+                  name="name"
                   placeholder="Name"
-                  value={name}
-                  onChange={(e) =>
-                    setName(e.target.value)
-                  }
+                  value={formData.name}
+                  onChange={handleChange}
                 />
 
                 <input
                   type="email"
+                  name="email"
                   placeholder="Email"
-                  value={email}
-                  onChange={(e) =>
-                    setEmail(e.target.value)
-                  }
+                  value={formData.email}
+                  onChange={handleChange}
                 />
 
                 <input
                   type="password"
+                  name="password"
                   placeholder="Password"
-                  value={password}
-                  onChange={(e) =>
-                    setPassword(e.target.value)
-                  }
+                  value={formData.password}
+                  onChange={handleChange}
                 />
 
                 <button type="submit">
@@ -196,11 +196,11 @@ function App() {
           path="/user-search"
           element={<UserSearch />}
         />
+
         <Route
-         path="*"
-         element={<NotFound />}
+          path="*"
+          element={<NotFound />}
         />
-        
       </Routes>
     </>
   );
