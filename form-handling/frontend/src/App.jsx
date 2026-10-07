@@ -6,6 +6,7 @@ function App() {
   const submitHandler = (e) => {
     e.preventDefault();
     console.log("form submitted with name:", title);
+    settitle('');
   };
 
   return (
@@ -14,6 +15,7 @@ function App() {
         <input 
           type="text"
           placeholder="enter your name"
+          value={title}
           onChange={(e) => {
             settitle(e.target.value);
             console.log(e.target.value); 
