@@ -8,14 +8,7 @@ import {
 
 export const createTask = async (req, res, next) => {
   try {
-    const { title, description, status, priority } = req.body;
-
-    const task = await createTaskService({
-      title,
-      description,
-      status,
-      priority,
-    });
+    const task = await createTaskService(req.body);
 
     res.status(201).json({
       message: "Task created successfully",
